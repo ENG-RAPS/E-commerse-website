@@ -44,6 +44,54 @@ const SimpleBarChart = ({ data, color = "bg-indigo-500" }: { data: { label: stri
   );
 };
 
+// Simple Pie Chart Component
+const SimplePieChart = ({ data }: { data: { label: string; value: number; color: string }[] }) => {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  
+  // Calculate gradient string for conic-gradient
+  let currentPercent = 0;
+  const gradientParts = data.map(item => {
+    const start = currentPercent;
+    const end = currentPercent + (item.value / total) * 100;
+    currentPercent = end;
+    return `${item.color} ${start}% ${end}%`;
+  }).join(', ');
+
+  const backgroundStyle = total > 0 
+    ? { background: `conic-gradient(${gradientParts})` }
+    : { background: '#f3f4f6' };
+
+  return (
+    <div className="h-64 flex flex-col sm:flex-row items-center justify-center gap-8 mt-4">
+      {/* Chart */}
+      <div className="relative w-48 h-48 shrink-0 rounded-full shadow-inner" style={backgroundStyle}>
+         {/* Donut Hole */}
+         <div className="absolute inset-0 m-auto w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-sm">
+            <div className="text-center">
+              <span className="block text-xs text-gray-400">Total Sales</span>
+              <span className="block text-xl font-bold text-gray-900">{total.toLocaleString()}</span>
+            </div>
+         </div>
+      </div>
+
+      {/* Legend */}
+      <div className="grid grid-cols-1 gap-y-3 min-w-[140px]">
+        {data.map((item, idx) => (
+          <div key={idx} className="flex items-center justify-between gap-4 w-full">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }}></div>
+              <span className="font-medium text-sm text-gray-700">{item.label}</span>
+            </div>
+            <span className="text-xs text-gray-500 font-mono">
+              {total > 0 ? Math.round((item.value / total) * 100) : 0}%
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export const Admin: React.FC<AdminProps> = ({ products, onAddProduct, onDeleteProduct, onUpdateProduct }) => {
   const [activeTab, setActiveTab] = useState<'inventory' | 'analytics' | 'ai-agent'>('analytics');
   const [isAdding, setIsAdding] = useState(false);
@@ -70,7 +118,13 @@ export const Admin: React.FC<AdminProps> = ({ products, onAddProduct, onDeletePr
     return acc;
   }, {} as Record<string, number>);
 
-  const categoryChartData = Object.entries(categorySales).map(([label, value]) => ({ label, value }));
+  const CHART_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6']; // Indigo, Emerald, Amber, Pink, Violet
+  
+  const categoryChartData = Object.entries(categorySales).map(([label, value], idx) => ({ 
+    label, 
+    value,
+    color: CHART_COLORS[idx % CHART_COLORS.length]
+  }));
 
   // Mock Weekly Data
   const weeklyData = [
@@ -395,7 +449,7 @@ export const Admin: React.FC<AdminProps> = ({ products, onAddProduct, onDeletePr
               <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <PieChart className="w-5 h-5 text-emerald-600" /> Sales by Category
               </h3>
-              <SimpleBarChart data={categoryChartData} color="bg-emerald-500" />
+              <SimplePieChart data={categoryChartData} />
             </div>
           </div>
 
