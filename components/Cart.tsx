@@ -62,7 +62,7 @@ export const Cart: React.FC<CartProps> = ({ items, onRemove, onUpdateQty, onChec
                       <div className="mt-1 flex text-sm">
                         <p className="text-gray-500">Size: {item.selectedSize}</p>
                       </div>
-                      <p className="mt-1 text-sm font-medium text-gray-900">${item.price.toFixed(2)}</p>
+                      <p className="mt-1 text-sm font-medium text-gray-900">KSh {item.price.toFixed(2)}</p>
                     </div>
 
                     <div className="mt-4 sm:mt-0 sm:pr-9">
@@ -106,19 +106,19 @@ export const Cart: React.FC<CartProps> = ({ items, onRemove, onUpdateQty, onChec
           <dl className="mt-6 space-y-4">
             <div className="flex items-center justify-between">
               <dt className="text-sm text-gray-600">Subtotal</dt>
-              <dd className="text-sm font-medium text-gray-900">${subtotal.toFixed(2)}</dd>
+              <dd className="text-sm font-medium text-gray-900">KSh {subtotal.toFixed(2)}</dd>
             </div>
             <div className="flex items-center justify-between border-t border-gray-200 pt-4">
               <dt className="flex items-center text-sm text-gray-600">
                 <span>Shipping estimate</span>
               </dt>
               <dd className="text-sm font-medium text-gray-900">
-                {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
+                {shipping === 0 ? 'Free' : `KSh ${shipping.toFixed(2)}`}
               </dd>
             </div>
             <div className="flex items-center justify-between border-t border-gray-200 pt-4">
               <dt className="text-base font-medium text-gray-900">Order total</dt>
-              <dd className="text-base font-medium text-gray-900">${total.toFixed(2)}</dd>
+              <dd className="text-base font-medium text-gray-900">KSh {total.toFixed(2)}</dd>
             </div>
           </dl>
 

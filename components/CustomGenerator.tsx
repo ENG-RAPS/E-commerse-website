@@ -44,7 +44,8 @@ export const CustomGenerator: React.FC<CustomGeneratorProps> = ({ onAddToCatalog
       sizes: [7, 8, 9, 10, 11, 12],
       category: 'Custom',
       rating: 5,
-      reviews: 0
+      reviews: 0,
+      sales: 0
     };
 
     onAddToCatalog(newProduct);

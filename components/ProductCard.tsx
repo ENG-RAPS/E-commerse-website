@@ -40,9 +40,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClic
         </div>
         <div className="mt-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-gray-900">${product.price.toFixed(2)}</span>
+            <span className="text-lg font-bold text-gray-900">KSh {product.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
             {product.originalPrice && (
-              <span className="text-sm text-gray-400 line-through">${product.originalPrice.toFixed(2)}</span>
+              <span className="text-sm text-gray-400 line-through">KSh {product.originalPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
             )}
           </div>
           <button className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">

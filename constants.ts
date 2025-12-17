@@ -12,7 +12,12 @@ export const MOCK_PRODUCTS: Product[] = [
     sizes: [7, 8, 9, 10, 11, 12],
     category: 'Running',
     rating: 4.8,
-    reviews: 124
+    reviews: 124,
+    sales: 1240,
+    reviewsList: [
+      { id: 'r1', userName: 'John Doe', rating: 5, comment: 'Best running shoes I have ever owned!', date: '2023-10-12' },
+      { id: 'r2', userName: 'Sarah K.', rating: 4, comment: 'Great comfort, but run slightly small.', date: '2023-11-05' }
+    ]
   },
   {
     id: '2',
@@ -24,7 +29,11 @@ export const MOCK_PRODUCTS: Product[] = [
     sizes: [6, 7, 8, 9, 10, 11],
     category: 'Lifestyle',
     rating: 4.5,
-    reviews: 89
+    reviews: 89,
+    sales: 850,
+    reviewsList: [
+      { id: 'r3', userName: 'Mike Ross', rating: 5, comment: 'Classic look, premium feel.', date: '2023-12-01' }
+    ]
   },
   {
     id: '3',
@@ -36,7 +45,9 @@ export const MOCK_PRODUCTS: Product[] = [
     sizes: [8, 9, 10, 11, 12, 13, 14],
     category: 'Basketball',
     rating: 4.9,
-    reviews: 210
+    reviews: 210,
+    sales: 2100,
+    reviewsList: []
   },
   {
     id: '4',
@@ -49,7 +60,9 @@ export const MOCK_PRODUCTS: Product[] = [
     sizes: [7, 8, 9, 10, 11],
     category: 'Lifestyle',
     rating: 4.2,
-    reviews: 56
+    reviews: 56,
+    sales: 120,
+    reviewsList: []
   },
   {
     id: '5',
@@ -61,7 +74,9 @@ export const MOCK_PRODUCTS: Product[] = [
     sizes: [7, 8, 9, 10, 11, 12],
     category: 'Running',
     rating: 5.0,
-    reviews: 42
+    reviews: 42,
+    sales: 300,
+    reviewsList: []
   },
   {
     id: '6',
@@ -73,6 +88,8 @@ export const MOCK_PRODUCTS: Product[] = [
     sizes: [8, 9, 10, 11, 12],
     category: 'Basketball',
     rating: 4.6,
-    reviews: 175
+    reviews: 175,
+    sales: 1800,
+    reviewsList: []
   }
 ];

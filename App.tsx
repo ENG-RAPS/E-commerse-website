@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { MOCK_PRODUCTS } from './constants';
-import { Product, CartItem, ViewState, User } from './types';
+import { Product, CartItem, ViewState, User, Review } from './types';
 import { Header } from './components/Header';
 import { ProductCard } from './components/ProductCard';
 import { Cart } from './components/Cart';
 import { CustomGenerator } from './components/CustomGenerator';
 import { Admin } from './components/Admin';
-import { ArrowRight, Star, Shield, Truck } from 'lucide-react';
+import { AboutUs } from './components/AboutUs';
+import { ChatWidget } from './components/ChatWidget';
+import { CheckoutModal } from './components/CheckoutModal';
+import { Login } from './components/Login';
+import { Register } from './components/Register';
+import { ArrowRight, Star, Shield, Truck, MessageSquare, Send } from 'lucide-react';
 
-// Simple Hero Component internal to App for brevity, or could be separate
+// Simple Hero Component internal to App for brevity
 const Hero = ({ onShopNow }: { onShopNow: () => void }) => (
   <div className="relative bg-black text-white overflow-hidden">
     <div className="absolute inset-0">
@@ -37,25 +42,50 @@ const Hero = ({ onShopNow }: { onShopNow: () => void }) => (
   </div>
 );
 
-// Product Detail Component (Internal for simple state mgmt)
+// Product Detail Component
 const ProductDetailView = ({ 
   product, 
   onAddToCart, 
-  onBack 
+  onBack,
+  onAddReview
 }: { 
   product: Product; 
   onAddToCart: (p: Product, size: number, qty: number) => void;
   onBack: () => void;
+  onAddReview: (productId: string, review: Review) => void;
 }) => {
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [quantity, setQuantity] = useState(1);
+  
+  // Review State
+  const [reviewText, setReviewText] = useState("");
+  const [rating, setRating] = useState(5);
+  const [userName, setUserName] = useState("");
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewText.trim() || !userName.trim()) return;
+
+    const newReview: Review = {
+      id: `r-${Date.now()}`,
+      userName,
+      rating,
+      comment: reviewText,
+      date: new Date().toISOString().split('T')[0]
+    };
+
+    onAddReview(product.id, newReview);
+    setReviewText("");
+    setUserName("");
+    alert("Review submitted!");
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <button onClick={onBack} className="text-gray-500 hover:text-black mb-6 flex items-center gap-2">
         &larr; Back to Shop
       </button>
-      <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
+      <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start mb-16">
         <div className="w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden sm:aspect-w-2 sm:aspect-h-3">
           <img src={product.image} alt={product.name} className="w-full h-full object-cover object-center" />
         </div>
@@ -63,7 +93,7 @@ const ProductDetailView = ({
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">{product.name}</h1>
           <div className="mt-3">
             <h2 className="sr-only">Product information</h2>
-            <p className="text-3xl text-gray-900">${product.price.toFixed(2)}</p>
+            <p className="text-3xl text-gray-900">KSh {product.price.toFixed(2)}</p>
           </div>
           
           <div className="mt-6">
@@ -124,43 +154,140 @@ const ProductDetailView = ({
 
           <div className="mt-6 flex gap-4 text-sm text-gray-500">
              <div className="flex items-center gap-1"><Shield className="w-4 h-4"/> Secure Checkout</div>
-             <div className="flex items-center gap-1"><Truck className="w-4 h-4"/> Free Shipping over $150</div>
+             <div className="flex items-center gap-1"><Truck className="w-4 h-4"/> Free Shipping over KSh 150</div>
           </div>
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="border-t border-gray-200 pt-16">
+        <h2 className="text-2xl font-bold text-gray-900 mb-8">Customer Reviews</h2>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+           {/* Review List */}
+           <div className="lg:col-span-7 space-y-8">
+             {(!product.reviewsList || product.reviewsList.length === 0) ? (
+               <p className="text-gray-500 italic">No reviews yet. Be the first to review!</p>
+             ) : (
+               product.reviewsList.map(review => (
+                 <div key={review.id} className="border-b border-gray-100 pb-8">
+                    <div className="flex items-center mb-2">
+                       <div className="flex text-yellow-400">
+                         {[...Array(5)].map((_, i) => (
+                           <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'text-gray-300'}`} />
+                         ))}
+                       </div>
+                       <span className="text-gray-900 font-bold ml-2">{review.userName}</span>
+                       <span className="text-gray-400 text-sm ml-auto">{review.date}</span>
+                    </div>
+                    <p className="text-gray-600">{review.comment}</p>
+                 </div>
+               ))
+             )}
+           </div>
+
+           {/* Review Form */}
+           <div className="lg:col-span-5">
+              <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                 <h3 className="text-lg font-bold text-gray-900 mb-4">Write a Review</h3>
+                 <form onSubmit={handleSubmitReview} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                      <input 
+                        type="text" 
+                        required
+                        className="w-full border border-gray-300 rounded-md p-2"
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                      <div className="flex gap-2">
+                         {[1, 2, 3, 4, 5].map(star => (
+                           <button 
+                             key={star}
+                             type="button"
+                             onClick={() => setRating(star)}
+                             className="focus:outline-none"
+                           >
+                             <Star className={`w-6 h-6 ${rating >= star ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
+                           </button>
+                         ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Review</label>
+                      <textarea 
+                        required
+                        rows={4}
+                        className="w-full border border-gray-300 rounded-md p-2"
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                      />
+                    </div>
+                    <button 
+                      type="submit"
+                      className="w-full bg-black text-white py-3 rounded-md font-bold hover:bg-gray-800 transition"
+                    >
+                      Submit Review
+                    </button>
+                 </form>
+              </div>
+           </div>
         </div>
       </div>
     </div>
   );
 };
 
-// Login Mock
-const LoginView = ({ onLogin }: { onLogin: (role: 'user' | 'admin') => void }) => (
-  <div className="flex items-center justify-center min-h-[60vh] px-4">
-    <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg border border-gray-100">
-      <div className="text-center">
-        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Welcome Back</h2>
-        <p className="mt-2 text-sm text-gray-600">Sign in to your account</p>
+// Shop View Component with Categories
+const ShopView = ({ 
+  products, 
+  onProductClick 
+}: { 
+  products: Product[]; 
+  onProductClick: (p: Product) => void 
+}) => {
+  const [category, setCategory] = useState<'All' | 'Running' | 'Lifestyle' | 'Basketball' | 'Custom'>('All');
+  
+  const filteredProducts = category === 'All' 
+    ? products 
+    : products.filter(p => p.category === category);
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Shop</h1>
+        <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto no-scrollbar">
+          {['All', 'Running', 'Lifestyle', 'Basketball', 'Custom'].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat as any)}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                category === cat 
+                  ? 'bg-black text-white' 
+                  : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-400'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="mt-8 space-y-6">
-        <div className="rounded-md shadow-sm -space-y-px">
-          <div>
-            <input type="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email address" />
+      <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+        {filteredProducts.map(product => (
+          <ProductCard key={product.id} product={product} onProductClick={onProductClick} />
+        ))}
+        {filteredProducts.length === 0 && (
+          <div className="col-span-full text-center py-20 text-gray-500">
+            No products found in this category.
           </div>
-          <div>
-            <input type="password" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Password" />
-          </div>
-        </div>
-        <div className="flex gap-4">
-          <button onClick={() => onLogin('user')} className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Sign in as User
-          </button>
-          <button onClick={() => onLogin('admin')} className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-            Sign in as Admin
-          </button>
-        </div>
+        )}
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function App() {
   const [view, setView] = useState<ViewState>('home');
@@ -168,6 +295,7 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   // Cart Logic
   const addToCart = (product: Product, selectedSize: number, quantity: number) => {
@@ -211,12 +339,45 @@ export default function App() {
     setProducts(products.filter(p => p.id !== id));
   };
 
+  const handleAdminUpdateProduct = (updatedProduct: Product) => {
+    setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+  };
+
+  const handleAddReview = (productId: string, review: Review) => {
+    setProducts(prevProducts => prevProducts.map(p => {
+      if (p.id === productId) {
+        const updatedReviews = [...(p.reviewsList || []), review];
+        return { ...p, reviewsList: updatedReviews, reviews: updatedReviews.length };
+      }
+      return p;
+    }));
+    
+    // Also update selected product if it matches
+    if (selectedProduct && selectedProduct.id === productId) {
+        const updatedReviews = [...(selectedProduct.reviewsList || []), review];
+        setSelectedProduct({ ...selectedProduct, reviewsList: updatedReviews, reviews: updatedReviews.length });
+    }
+  };
+
   const handleLogin = (role: 'user' | 'admin') => {
     setUser({ id: 'u1', name: 'Demo User', email: 'demo@example.com', role });
     setView('home');
   };
 
+  const handleRegister = (name: string, email: string) => {
+    // In a real app, this would send data to the backend
+    setUser({ id: `u-${Date.now()}`, name, email, role: 'user' });
+    setView('home');
+  };
+
+  const handleCheckoutSuccess = () => {
+    setCart([]);
+    setIsCheckoutOpen(false);
+    setView('home');
+  };
+
   const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0) + (cart.reduce((sum, item) => sum + item.price * item.quantity, 0) > 150 ? 0 : 15);
 
   // Render Logic
   const renderContent = () => {
@@ -259,22 +420,16 @@ export default function App() {
           </>
         );
       case 'shop':
-        return (
-          <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">All Sneakers</h1>
-            <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-              {products.map(product => (
-                <ProductCard key={product.id} product={product} onProductClick={handleProductClick} />
-              ))}
-            </div>
-          </div>
-        );
+        return <ShopView products={products} onProductClick={handleProductClick} />;
+      case 'about':
+        return <AboutUs />;
       case 'product':
         return selectedProduct ? (
           <ProductDetailView 
             product={selectedProduct} 
             onAddToCart={addToCart} 
-            onBack={() => setView('shop')} 
+            onBack={() => setView('shop')}
+            onAddReview={handleAddReview}
           />
         ) : null;
       case 'cart':
@@ -283,7 +438,7 @@ export default function App() {
             items={cart} 
             onRemove={removeFromCart} 
             onUpdateQty={updateCartQty} 
-            onCheckout={() => alert('Checkout Integration Coming Soon!')} 
+            onCheckout={() => setIsCheckoutOpen(true)} 
             onContinueShopping={() => setView('shop')}
           />
         );
@@ -297,13 +452,16 @@ export default function App() {
           />
         );
       case 'login':
-        return <LoginView onLogin={handleLogin} />;
+        return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
+      case 'register':
+        return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
       case 'admin':
         return user?.role === 'admin' ? (
           <Admin 
             products={products} 
             onAddProduct={handleAdminAddProduct} 
             onDeleteProduct={handleAdminDeleteProduct} 
+            onUpdateProduct={handleAdminUpdateProduct}
           />
         ) : (
           <div className="text-center py-20">
@@ -360,6 +518,14 @@ export default function App() {
           </p>
         </div>
       </footer>
+      
+      <ChatWidget />
+      <CheckoutModal 
+        isOpen={isCheckoutOpen} 
+        onClose={() => setIsCheckoutOpen(false)} 
+        total={cartTotal}
+        onSuccess={handleCheckoutSuccess}
+      />
     </div>
   );
 }

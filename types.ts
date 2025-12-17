@@ -1,3 +1,11 @@
+export interface Review {
+  id: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -10,6 +18,8 @@ export interface Product {
   category: 'Running' | 'Lifestyle' | 'Basketball' | 'Custom';
   rating: number;
   reviews: number;
+  sales: number; // For analytics
+  reviewsList?: Review[]; // List of specific comments
 }
 
 export interface CartItem extends Product {
@@ -24,13 +34,21 @@ export interface User {
   role: 'user' | 'admin';
 }
 
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  read: boolean;
+  time: string;
+}
+
 export enum ImageSize {
   OneK = '1K',
   TwoK = '2K',
   FourK = '4K'
 }
 
-export type ViewState = 'home' | 'shop' | 'product' | 'cart' | 'generator' | 'login' | 'admin';
+export type ViewState = 'home' | 'shop' | 'product' | 'cart' | 'generator' | 'login' | 'register' | 'admin' | 'about';
 
 // Extend Window interface for AI Studio
 declare global {
